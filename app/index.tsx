@@ -9,11 +9,11 @@ export default function Landing() {
       <Text style={styles.subtitle}>Your secure place for smart note taking</Text>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => router.push('/signin/sign-in')}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push('./auth/sign-in')}>
           <Text style={styles.buttonText}>Sign In</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={() => router.push('/signup')}>
+        <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={() => router.push('./auth/sign-up')}>
           <Text style={[styles.buttonText, styles.secondaryButtonText]}>Sign Up</Text>
         </TouchableOpacity>
       </View>
