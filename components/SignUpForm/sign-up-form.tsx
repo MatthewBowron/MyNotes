@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
-import { supabase } from '../../lib/supabase';
 import { router } from "expo-router";
+import { createUser } from "../../lib/db";
 
 export default function SignUpForm() {
   const [firstName, setFirstName] = useState("");
@@ -19,29 +19,9 @@ export default function SignUpForm() {
 
   const handleSignUp = async () => {
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (signUpError) throw signUpError;
-
-      const user = data.user;
-      if (user) {
-        const { error: insertError } = await supabase.from("user_details").insert({
-          uuid: user.id,
-          first_name: firstName,
-          last_name: lastName,
-          email,
-        });
-
-        if (insertError) throw insertError;
-
-        Alert.alert("Success", "Account created. Please sign in.");
-        router.push("/sign-in");
-      } else {
-        throw new Error("User not returned.");
-      }
+      createUser(firstName, lastName, email, password);
+      Alert.alert("Success", "Account created. Please sign in.");
+      router.push("./sign-in");
     } catch (error: any) {
       Alert.alert("Error", error.message || "Something went wrong");
       clearForm();
