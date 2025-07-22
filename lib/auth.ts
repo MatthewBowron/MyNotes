@@ -12,12 +12,12 @@ export async function signIn(email: string, password: string){
   else return data.user;
 }
 
-export async function signOut(){
+export async function SignOut(){
   const error = await supabase.auth.signOut();
   if (error) throw error;
 }
 
-export async function authenticate() {
+export async function Authenticate() {
   const {data: {user}, error} = await supabase.auth.getUser();
   if (error || !user) throw new Error("User not authenticate")
   return user;
