@@ -1,15 +1,39 @@
+import '../polyfills';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
+
 export default function Landing() {
+  // 1) Known-good HTTPS
+    fetch('https://httpbin.org/status/200')
+      .then(r => console.log('[probe] httpbin', r.status))
+      .catch(e => console.log('[probe] httpbin failed', e));
+
+    // 2) Supabase Auth health
+    fetch(`${process.env.EXPO_PUBLIC_SUPABASE_URL}/auth/v1/health`)
+      .then(r => r.text())
+      .then(t => console.log('[probe] supabase health', t))
+      .catch(e => console.log('[probe] supabase health failed', e));
+
+    // 3) Supabase REST (any public table will 401 but should NOT network-fail)
+    fetch(`${process.env.EXPO_PUBLIC_SUPABASE_URL}/rest/v1/`,
+      { headers: { apikey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY! } }
+    )
+      .then(r => console.log('[probe] rest root', r.status))
+      .catch(e => console.log('[probe] rest failed', e));
+
+  
   return (
+    
+
+
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to MyNotes</Text>
       <Text style={styles.subtitle}>Your secure place for smart note taking</Text>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => router.push('./auth/sign-in')}>
+        <TouchableOpacity style={styles.button}  onPress={() => router.push('/auth/sign-in')}>
           <Text style={styles.buttonText}>Sign In</Text>
         </TouchableOpacity>
 

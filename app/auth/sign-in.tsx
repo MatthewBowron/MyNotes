@@ -7,7 +7,7 @@ export default function SignIn() {
     <View style={styles.container}>
       <SignInForm />
 
-      <Link href="/signin/sign-up">
+      <Link href="/auth/sign-up">
         <Text style={styles.signUpText}>
           Don’t have an account? Sign up here →
         </Text>

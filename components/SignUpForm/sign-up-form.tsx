@@ -19,7 +19,7 @@ export default function SignUpForm() {
 
   const handleSignUp = async () => {
     try {
-      createUser(firstName, lastName, email, password);
+      await createUser(firstName, lastName, email, password);
       Alert.alert("Success", "Account created. Please sign in.");
       router.push("./sign-in");
     } catch (error: any) {
