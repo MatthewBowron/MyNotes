@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 
 type Item = { id: string; title: string; date: string; kind: "folder" | "note" };
 
@@ -30,8 +30,9 @@ const COLORS = {
 };
 
 export default function Dashboard() {
-  const [showSearch, setShowSearch] = useState<boolean>(false);
-  const [q, setQ] = useState<string>("");
+  const router = useRouter();
+  const [showSearch, setShowSearch] = useState(false);
+  const [q, setQ] = useState("");
 
   const list = useMemo(
     () => DATA.filter((x) => x.title.toLowerCase().includes(q.toLowerCase())),
@@ -39,13 +40,12 @@ export default function Dashboard() {
   );
 
   const openItem = (item: Item) => {
-  if (item.id === "new-notes") {
-    router.push("/notes/new");           
-  } else {
-    router.push({ pathname: "/notes/[category]", params: { category: item.id } });
-  }
-};
-
+    if (item.id === "new-notes") {
+      router.push("/notes/new");
+    } else {
+      router.push({ pathname: "/notes/[category]", params: { category: item.id } });
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -82,7 +82,7 @@ export default function Dashboard() {
         </View>
 
         <TouchableOpacity
-          onPress={() => setShowSearch((s: boolean) => !s)}
+          onPress={() => setShowSearch((s) => !s)}
           hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
         >
           <Text style={styles.smallIcon}>🔍</Text>
@@ -108,7 +108,7 @@ export default function Dashboard() {
 
       {/* List */}
       <ScrollView contentContainerStyle={styles.list}>
-        {list.map((item: Item) => (
+        {list.map((item) => (
           <TouchableOpacity key={item.id} style={styles.row} onPress={() => openItem(item)}>
             <View style={styles.rowLeft}>
               <Text style={styles.rowIcon}>{item.kind === "folder" ? "📁" : "📝"}</Text>
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 12,
     paddingLeft: 12,
-    paddingRight: 36, // room for clear button
+    paddingRight: 36,
     backgroundColor: "#fff",
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "#cfe7ef",

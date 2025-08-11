@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, Text, View, TextInput, Alert } from "react-native";
 import validateSignIn from "./sign-in-server";
 import { router } from 'expo-router';
-router.replace("/dashboard");
 
 import { AuthApiError } from "@supabase/supabase-js";
 
