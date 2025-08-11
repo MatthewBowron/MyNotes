@@ -1,6 +1,8 @@
+import '../polyfills';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+
 
 export default function Landing() {
   return (
@@ -9,7 +11,7 @@ export default function Landing() {
       <Text style={styles.subtitle}>Your secure place for smart note taking</Text>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => router.push('./auth/sign-in')}>
+        <TouchableOpacity style={styles.button}  onPress={() => router.push('/auth/sign-in')}>
           <Text style={styles.buttonText}>Sign In</Text>
         </TouchableOpacity>
 
