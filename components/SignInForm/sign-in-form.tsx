@@ -19,8 +19,9 @@ export default function SignInForm() {
 
   const handleSubmit = async () => {
     try {
+      
       const userData = await validateSignIn(username, password);
-
+      
       if (userData) {
         router.push("/landing");
       } else {
