@@ -29,7 +29,7 @@ const COLORS = {
   rowBorder: "#a9d9ef",
 };
 
-export default function Landing() {
+export default function Dashboard() {
   const router = useRouter();
   const [showSearch, setShowSearch] = useState(false);
   const [q, setQ] = useState("");
@@ -41,7 +41,7 @@ export default function Landing() {
 
   const openItem = (item: Item) => {
     if (item.id === "new-notes") {
-      router.push("/notes/new");
+      router.push("/notes/new"); // ✅ fixed path
     } else {
       router.push({ pathname: "/notes/[category]", params: { category: item.id } });
     }
@@ -52,7 +52,7 @@ export default function Landing() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => router.push("'/notes/new")}
+          onPress={() => router.push("'/notes/new/index")} // ✅ fixed path
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           <Text style={styles.headerIcon}></Text>

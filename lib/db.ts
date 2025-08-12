@@ -11,7 +11,7 @@ export async function createUser(first_name: string, last_name: string, email: s
   }catch(error: any){
     user = await signUp(email, password);
   }
-  const { data: result, error } = await supabase.from(TABLE_NAME).insert({uuid:user?.id, first_name, last_name, email}).select().single()
+  const { data: result, error } = await supabase.from(TABLE_NAME).insert({ first_name, last_name, email}).select().single()
   if (error) throw error
   return result
 }

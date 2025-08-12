@@ -14,17 +14,4 @@ const supabase = createClient(
   }}
 );
 
-
-const check =async ()=>{
-  try {
-  const r = await fetch(`${process.env.EXPO_PUBLIC_SUPABASE_URL}/auth/v1/token?grant_type=password`, { method: 'POST' });
-  console.log('Auth endpoint reachable?', r.status); // 400/401 is OK (means reachable)
-} catch (e) {
-  console.log('Cannot reach Supabase URL:', e);
-}}
-
-
-console.log('SUPABASE_URL =', process.env.EXPO_PUBLIC_SUPABASE_URL);
-console.log(check())
-
 export default supabase;
