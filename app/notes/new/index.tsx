@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import { useRouter } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
+import { addNote, getNote, updateNote, deleteNote } from "../../../lib/notes";
 
 const COLORS = {
   page: "#e9f7fb",
@@ -9,86 +10,153 @@ const COLORS = {
   buttonText: "#fff",
   inputBg: "#fff",
   inputBorder: "#ccc",
+  danger: "#ff3b30",
 };
 
 export default function NewNote() {
-  const router = useRouter();
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const params = useLocalSearchParams<{ id?: string; category?: string }>();
+  const id = params.id ? String(params.id) : undefined;
 
-  const handleSave = () => {
-    if (!title.trim()) {
-      Alert.alert("Error", "Please enter a title for the note.");
+  // New: editable category field (prefilled from params if present)
+  const [category, setCategory] = useState(params.category ? String(params.category) : "");
+  const [content, setContent] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(!!id);
+
+  useEffect(() => {
+    (async () => {
+      if (!id) return;
+      try {
+        setLoading(true);
+        const note = await getNote(id);
+        setContent(note.content ?? "");
+        // If note has category, show it; otherwise keep whatever came from params
+        if (note.category !== undefined) setCategory(note.category ?? "");
+      } catch (e: any) {
+        Alert.alert("Error", e?.message ?? "Failed to load note");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [id]);
+
+  const onSave = async () => {
+    if (!category.trim()) {
+      Alert.alert("Missing category", "Please add a category.");
       return;
     }
-    // For now, just log the note
-    console.log({ title, content });
+    if (!content.trim()) {
+      Alert.alert("Empty note", "Please write something.");
+      return;
+    }
 
-    Alert.alert("Success", "Note saved (not connected to DB yet).", [
-      { text: "OK", onPress: () => router.back() }
+    try {
+      setSaving(true);
+      if (id) {
+        await updateNote(id, content, category);
+      } else {
+        await addNote(content, category);
+      }
+      router.back();
+    } catch (e: any) {
+      Alert.alert("Error", e?.message ?? "Failed to save note");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const onDelete = () => {
+    if (!id) return;
+    Alert.alert("Delete note", "Are you sure you want to delete this note?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await deleteNote(id);
+            router.back();
+          } catch (e: any) {
+            Alert.alert("Error", e?.message ?? "Failed to delete");
+          }
+        },
+      },
     ]);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>New Note</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Title"
-        value={title}
-        onChangeText={setTitle}
-      />
-
-      <TextInput
-        style={[styles.input, styles.multiline]}
-        placeholder="Write your note here..."
-        value={content}
-        onChangeText={setContent}
-        multiline
-      />
-
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={[styles.button, { backgroundColor: "#bbb" }]} onPress={() => router.back()}>
-          <Text style={styles.buttonText}>Cancel</Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Text style={styles.back}>←</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={handleSave}>
-          <Text style={styles.buttonText}>Save</Text>
+        <Text style={styles.title}>{id ? "Edit Note" : "New Note"}{category ? ` (${category})` : ""}</Text>
+        <TouchableOpacity onPress={onSave} disabled={saving || loading}>
+          <Text style={[styles.save, (saving || loading) && { opacity: 0.5 }]}>Save</Text>
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.body}>
+        {/* New: Category input (required) */}
+        <Text style={styles.label}>Category</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="e.g., Current Classes"
+          value={category}
+          onChangeText={setCategory}
+          autoCapitalize="none"
+        />
+
+        <Text style={styles.label}>Content</Text>
+        <TextInput
+          style={[styles.input, styles.textarea]}
+          placeholder="Write your note..."
+          value={content}
+          onChangeText={setContent}
+          multiline
+          textAlignVertical="top"
+        />
+
+        {id ? (
+          <TouchableOpacity style={styles.deleteBtn} onPress={onDelete}>
+            <Text style={styles.deleteText}>Delete</Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: COLORS.page },
-  heading: { fontSize: 22, fontWeight: "700", marginBottom: 20, textAlign: "center" },
+  container: { flex: 1, backgroundColor: COLORS.page },
+  header: {
+    height: 56,
+    paddingHorizontal: 12,
+    backgroundColor: COLORS.header,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  back: { fontSize: 20, padding: 6 },
+  title: { fontSize: 18, fontWeight: "700" },
+  save: { fontSize: 16, fontWeight: "700", color: "#007AFF", padding: 6 },
+  body: { flex: 1, padding: 16 },
+  label: { fontSize: 12, color: "#666", marginTop: 12 },
   input: {
     backgroundColor: COLORS.inputBg,
     borderWidth: 1,
     borderColor: COLORS.inputBorder,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-    marginBottom: 12,
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 6,
   },
-  multiline: {
-    minHeight: 150,
-    textAlignVertical: "top",
-  },
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  textarea: { height: 260 },
+  deleteBtn: {
     marginTop: 16,
-  },
-  button: {
-    flex: 0.48,
-    backgroundColor: COLORS.button,
+    backgroundColor: COLORS.danger,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
   },
-  buttonText: { color: COLORS.buttonText, fontWeight: "600", fontSize: 16 },
+  deleteText: { color: COLORS.buttonText, fontWeight: "600", fontSize: 16 },
 });
