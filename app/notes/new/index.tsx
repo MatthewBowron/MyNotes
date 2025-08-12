@@ -101,7 +101,7 @@ export default function NewNote() {
         <Text style={styles.label}>Category</Text>
         <TextInput
           style={styles.input}
-          placeholder="e.g., Current Classes"
+          placeholder="e.g., Current-classes"
           value={category}
           onChangeText={setCategory}
           autoCapitalize="none"
