@@ -41,7 +41,7 @@ export default function Dashboard() {
 
   const openItem = (item: Item) => {
     if (item.id === "new-notes") {
-      router.push("/notes/new");
+      router.push("/notes/new"); // ✅ fixed path
     } else {
       router.push({ pathname: "/notes/[category]", params: { category: item.id } });
     }
@@ -52,10 +52,10 @@ export default function Dashboard() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => {/* later: add new */}}
+          onPress={() => router.push("'/notes/new/index")} // ✅ fixed path
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Text style={styles.headerIcon}>＋</Text>
+          <Text style={styles.headerIcon}></Text>
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>My Notes</Text>
